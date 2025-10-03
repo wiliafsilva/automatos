@@ -1,1 +1,0 @@
-# bookstore_maneger_course
