@@ -127,33 +127,24 @@ user_seq = st.text_input("Digite a sequência separada por espaços (ex: G S G A
 entrada = user_seq.strip().split()
 
 def aceita(sequencia):
-    estado = 'q0'
+    # Estados: espera (G/S), A1, I, A2, F
+    etapas = ['A1', 'I', 'A2', 'F']
+    etapa_atual = 0  # começa na primeira etapa obrigatória
     for simbolo in sequencia:
-        if estado == 'q0':
-            if simbolo in ['G', 'S']:
-                continue  # permanece no mesmo estado
-            elif simbolo == 'A1':
-                estado = 'q1'
+        if simbolo in ['G', 'S']:
+            continue  # G/S podem aparecer em qualquer momento antes de A1
+        elif etapa_atual < len(etapas) and simbolo == etapas[etapa_atual]:
+            etapa_atual += 1  # avançar para próxima etapa
+        elif etapa_atual < len(etapas) and simbolo in etapas[etapa_atual+1:]:
+            # Permite começar em qualquer etapa, mas nunca voltar
+            proxima = etapas.index(simbolo)
+            if proxima == etapa_atual or proxima == etapa_atual + 1:
+                etapa_atual = proxima + 1
             else:
                 return False
-        elif estado == 'q1':
-            if simbolo == 'I':
-                estado = 'q2'
-            else:
-                return False
-        elif estado == 'q2':
-            if simbolo == 'A2':
-                estado = 'q3'
-            else:
-                return False
-        elif estado == 'q3':
-            if simbolo == 'F':
-                estado = 'qf'
-            else:
-                return False
-        elif estado == 'qf':
-            return False  # depois do final, nada deve ocorrer
-    return estado == 'qf'
+        else:
+            return False
+    return etapa_atual == len(etapas)
 
 if user_seq:
     if aceita(entrada):
